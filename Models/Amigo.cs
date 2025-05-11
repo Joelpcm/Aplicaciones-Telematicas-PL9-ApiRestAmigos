@@ -9,10 +9,10 @@ namespace Amigos.Models
         [Display(Name = "Nombre")]
         public string? name { get; set; }
 
-        [Display(Name = "Longitud")]
-        public string? longi { get; set; }
-
         [Display(Name = "Latitud")]
         public string? lati { get; set; }
+
+        [Display(Name = "Longitud")]
+        public string? longi { get; set; }
     }
 }
