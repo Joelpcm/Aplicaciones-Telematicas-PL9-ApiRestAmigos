@@ -81,6 +81,35 @@ namespace Amigos.Controllers
             return NoContent();
         }
 
+        // PUT: api/AmigoAPI/posicion
+        [HttpPut("posicion")]
+        public async Task<IActionResult> ActualizarPosicion([FromBody] ActualizacionPosicion actualizacion)
+        {
+            if (string.IsNullOrWhiteSpace(actualizacion.Name)) 
+            { 
+                return BadRequest("El nombre es obligatorio.");
+            }
+
+            if (_context.Amigos == null)
+            {
+                return Problem("DataContext \"Amigos\" es nulo");
+            }
+
+            var amigo = await _context.Amigos.FirstOrDefaultAsync(a => a.name == actualizacion.Name);
+
+            if (amigo == null)
+            {
+                return NotFound($"No se encontró un amigo con el nombre '{actualizacion.Name}'.");
+            }
+
+            amigo.lati = actualizacion.Lati;
+            amigo.longi = actualizacion.Longi;
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
         // POST: api/AmigoAPI
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
