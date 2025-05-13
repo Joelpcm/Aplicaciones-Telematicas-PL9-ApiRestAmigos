@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Amigos.DataAccessLayer;
 using Amigos.Models;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Amigos.Controllers
 {
@@ -15,10 +16,13 @@ namespace Amigos.Controllers
     public class AmigoAPIController : ControllerBase
     {
         private readonly AmigoDBContext _context;
+        private readonly IHubContext<SignalRNotification> _hubContext;
 
-        public AmigoAPIController(AmigoDBContext context)
+
+        public AmigoAPIController(AmigoDBContext context, IHubContext<SignalRNotification> hubContext)
         {
             _context = context;
+            _hubContext = hubContext;
         }
 
         // GET: api/AmigoAPI
@@ -65,6 +69,9 @@ namespace Amigos.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+
+                // Notificar a todos los clientes que hubo un cambio
+                await _hubContext.Clients.All.SendAsync("NotifyLocationUpdate");
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -107,6 +114,9 @@ namespace Amigos.Controllers
 
             await _context.SaveChangesAsync();
 
+            // Notificar a todos los clientes que hubo un cambio de posición
+            await _hubContext.Clients.All.SendAsync("NotifyLocationUpdate");
+
             return NoContent();
         }
 
@@ -121,6 +131,9 @@ namespace Amigos.Controllers
           }
             _context.Amigos.Add(amigo);
             await _context.SaveChangesAsync();
+
+            // Notificar a todos los clientes que hubo un cambio
+            await _hubContext.Clients.All.SendAsync("NotifyLocationUpdate");
 
             return CreatedAtAction("GetAmigo", new { id = amigo.ID }, amigo);
         }
@@ -141,6 +154,9 @@ namespace Amigos.Controllers
 
             _context.Amigos.Remove(amigo);
             await _context.SaveChangesAsync();
+
+            // Notificar a todos los clientes que hubo un cambio
+            await _hubContext.Clients.All.SendAsync("NotifyLocationUpdate");
 
             return NoContent();
         }

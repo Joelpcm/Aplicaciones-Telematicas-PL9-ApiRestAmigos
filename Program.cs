@@ -1,5 +1,6 @@
 using Amigos.DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.SignalR;
 
 
 namespace Amigos
@@ -22,6 +23,10 @@ namespace Amigos
                          options.UseSqlite("Data Source=Amigos.db"));
 
 
+            // Agregar SignalR a los servicios
+            builder.Services.AddSignalR();  // Añadir SignalR aquí
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -34,6 +39,11 @@ namespace Amigos
             app.UseRouting();
 
             app.UseAuthorization();
+
+
+            // Mapeo de rutas de SignalR
+            app.MapHub<SignalRNotification>("/notificaciones");
+
 
             app.MapControllerRoute(
                 name: "default",
